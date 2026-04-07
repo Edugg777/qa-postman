@@ -1,0 +1,3375 @@
+{
+  "info": {
+    "_postman_id": "44d72925-7cb6-494f-8497-6a9b66c16fbe",
+    "name": "API Club de Tenis - Contrato Corregido y Blindado",
+    "description": "API REST para la gestión de socios, autenticación, pistas, disponibilidad y reservas. Incluye JWT Bearer, validaciones de esquema reforzadas, respuestas tipadas, control de roles (Socio/Admin), prevención de solapamientos y errores JSON estandarizados.\n",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53787266",
+    "_collection_link": "https://go.postman.co/collection/53787266-44d72925-7cb6-494f-8497-6a9b66c16fbe?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "register",
+          "item": [
+            {
+              "name": "Registro de nuevo socio (US-01)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan@tenis.com\",\n  \"password\": \"MiClaveSegura123\",\n  \"telefono\": \"+34600112233\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/register",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                },
+                "description": "Crea un nuevo usuario con rol Socio. El rol no puede ser enviado por el cliente para evitar elevación de privilegios.\n"
+              },
+              "response": [
+                {
+                  "name": "Usuario creado correctamente.",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan@tenis.com\",\n  \"password\": \"MiClaveSegura123\",\n  \"telefono\": \"+34600112233\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/auth/register",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "auth",
+                        "register"
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": 10,\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan@tenis.com\",\n  \"telefono\": \"+34600112233\",\n  \"rol\": \"Socio\",\n  \"activo\": true,\n  \"createdAt\": \"2026-04-06T10:00:00Z\",\n  \"updatedAt\": \"2026-04-06T10:15:00Z\"\n}"
+                },
+                {
+                  "name": "Bad Request - Datos inválidos.",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan@tenis.com\",\n  \"password\": \"MiClaveSegura123\",\n  \"telefono\": \"+34600112233\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/auth/register",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "auth",
+                        "register"
+                      ]
+                    }
+                  },
+                  "status": "Bad Request",
+                  "code": 400,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Conflict - El email ya existe.",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan@tenis.com\",\n  \"password\": \"MiClaveSegura123\",\n  \"telefono\": \"+34600112233\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/auth/register",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "auth",
+                        "register"
+                      ]
+                    }
+                  },
+                  "status": "Conflict",
+                  "code": 409,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "login",
+          "item": [
+            {
+              "name": "Inicio de sesión seguro (US-02)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"juan@tenis.com\",\n  \"password\": \"MiClaveSegura123\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "Valida credenciales y devuelve un token JWT válido. El cliente, tras recibir 200, debe redirigir a la vista de \"Mis Reservas\". Si las credenciales no son correctas, el servidor devolverá un error genérico sin indicar si el fallo es del email o de la contraseña.\n"
+              },
+              "response": [
+                {
+                  "name": "OK - Devuelve Token JWT válido y datos básicos del usuario autenticado.",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"email\": \"juan@tenis.com\",\n  \"password\": \"MiClaveSegura123\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/auth/login",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "auth",
+                        "login"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"tokenType\": \"Bearer\",\n  \"expiresIn\": 3600,\n  \"usuario\": {\n    \"id\": 10,\n    \"nombre\": \"Juan Pérez\",\n    \"email\": \"juan@tenis.com\",\n    \"rol\": \"Socio\"\n  }\n}"
+                },
+                {
+                  "name": "Unauthorized - Credenciales inválidas.",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"email\": \"juan@tenis.com\",\n  \"password\": \"MiClaveSegura123\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/auth/login",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "auth",
+                        "login"
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "usuarios",
+      "item": [
+        {
+          "name": "me",
+          "item": [
+            {
+              "name": "Obtener mi perfil",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/usuarios/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "usuarios",
+                    "me"
+                  ]
+                },
+                "description": "Devuelve el perfil del usuario autenticado."
+              },
+              "response": [
+                {
+                  "name": "OK - Perfil del usuario autenticado.",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/me",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        "me"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": 10,\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan@tenis.com\",\n  \"telefono\": \"+34600112233\",\n  \"rol\": \"Socio\",\n  \"activo\": true,\n  \"createdAt\": \"2026-04-06T10:00:00Z\",\n  \"updatedAt\": \"2026-04-06T10:15:00Z\"\n}"
+                },
+                {
+                  "name": "Unauthorized - Token ausente, expirado o inválido.",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/me",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        "me"
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "{id}",
+          "item": [
+            {
+              "name": "Editar perfil (US-11)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"telefono\": 2285\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/usuarios/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "usuarios",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "470",
+                      "description": "Identificador del usuario."
+                    }
+                  ]
+                },
+                "description": "Permite al socio autenticado actualizar su email y/o teléfono. El servidor debe validar que el recurso coincide con el usuario autenticado o que el actor tiene privilegios suficientes.\n"
+              },
+              "response": [
+                {
+                  "name": "OK - Perfil actualizado correctamente.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"telefono\": 2285\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador del usuario."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": 10,\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan@tenis.com\",\n  \"telefono\": \"+34600112233\",\n  \"rol\": \"Socio\",\n  \"activo\": true,\n  \"createdAt\": \"2026-04-06T10:00:00Z\",\n  \"updatedAt\": \"2026-04-06T10:15:00Z\"\n}"
+                },
+                {
+                  "name": "Bad Request - Formato inválido de email o teléfono.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"telefono\": 2285\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador del usuario."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Bad Request",
+                  "code": 400,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Unauthorized - Token ausente, expirado o inválido.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"telefono\": 2285\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador del usuario."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Forbidden - No puedes editar el perfil de otro socio.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"telefono\": 2285\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador del usuario."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Forbidden",
+                  "code": 403,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Not Found - Usuario no encontrado.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"telefono\": 2285\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador del usuario."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Conflict - El email ya está en uso por otro usuario.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"telefono\": 2285\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador del usuario."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Conflict",
+                  "code": 409,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                }
+              ]
+            },
+            {
+              "name": "Eliminar usuario / baja de socio (US-06)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"password\": \"MiClaveSegura123\",\n  \"confirmar\": true\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/usuarios/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "usuarios",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "470",
+                      "description": "Identificador del usuario."
+                    }
+                  ]
+                },
+                "description": "Solicita la baja del socio autenticado. Requiere doble confirmación mediante password y flag de confirmación. El backend debe invalidar la sesión/token del usuario y preservar la integridad histórica de las reservas mediante borrado lógico y/o anonimización.\n"
+              },
+              "response": [
+                {
+                  "name": "No Content - Usuario dado de baja correctamente.",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"password\": \"MiClaveSegura123\",\n  \"confirmar\": true\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador del usuario."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "No Content",
+                  "code": 204,
+                  "_postman_previewlanguage": "text",
+                  "header": [],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Bad Request - Falta confirmación o la contraseña es inválida.",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"password\": \"MiClaveSegura123\",\n  \"confirmar\": true\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador del usuario."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Bad Request",
+                  "code": 400,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Unauthorized - Token ausente, expirado o inválido.",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"password\": \"MiClaveSegura123\",\n  \"confirmar\": true\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador del usuario."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Forbidden - No puedes borrar a otros socios.",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"password\": \"MiClaveSegura123\",\n  \"confirmar\": true\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador del usuario."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Forbidden",
+                  "code": 403,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Not Found - Usuario no encontrado.",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"password\": \"MiClaveSegura123\",\n  \"confirmar\": true\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/usuarios/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "usuarios",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador del usuario."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pistas",
+      "item": [
+        {
+          "name": "{id}",
+          "item": [
+            {
+              "name": "Obtener detalle de una pista",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/pistas/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "pistas",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "470",
+                      "description": "Identificador de la pista."
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "OK - Detalle de la pista.",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": 1,\n  \"nombre\": \"Pista Central\",\n  \"superficie\": \"TierraBatida\",\n  \"estado\": \"Disponible\",\n  \"createdAt\": \"2026-04-06T09:00:00Z\",\n  \"updatedAt\": \"2026-04-06T09:30:00Z\"\n}"
+                },
+                {
+                  "name": "Unauthorized - Token ausente, expirado o inválido.",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Not Found - Pista no encontrada.",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                }
+              ]
+            },
+            {
+              "name": "Editar pista (US-05 / US-07)",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": true\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/pistas/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "pistas",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "470",
+                      "description": "Identificador de la pista."
+                    }
+                  ]
+                },
+                "description": "Solo un usuario con rol Administrador puede editar pistas."
+              },
+              "response": [
+                {
+                  "name": "OK - Pista actualizada correctamente.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nombre\": true\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"id\": 1,\n  \"nombre\": \"Pista Central\",\n  \"superficie\": \"TierraBatida\",\n  \"estado\": \"Disponible\",\n  \"createdAt\": \"2026-04-06T09:00:00Z\",\n  \"updatedAt\": \"2026-04-06T09:30:00Z\"\n}"
+                },
+                {
+                  "name": "Bad Request - Datos de pista inválidos.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nombre\": true\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Bad Request",
+                  "code": 400,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Unauthorized - Token ausente, expirado o inválido.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nombre\": true\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Forbidden - Se requiere rol Administrador.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nombre\": true\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Forbidden",
+                  "code": 403,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Not Found - Pista no encontrada.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nombre\": true\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Conflict - Ya existe otra pista con ese nombre.",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nombre\": true\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Conflict",
+                  "code": 409,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                }
+              ]
+            },
+            {
+              "name": "Eliminar pista (US-05 / US-07)",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/pistas/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "pistas",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "470",
+                      "description": "Identificador de la pista."
+                    }
+                  ]
+                },
+                "description": "Solo un usuario con rol Administrador puede eliminar pistas. El backend puede rechazar la eliminación si existen reservas futuras asociadas.\n"
+              },
+              "response": [
+                {
+                  "name": "No Content - Pista eliminada correctamente.",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "No Content",
+                  "code": 204,
+                  "_postman_previewlanguage": "text",
+                  "header": [],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Unauthorized - Token ausente, expirado o inválido.",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Forbidden - Se requiere rol Administrador.",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Forbidden",
+                  "code": 403,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Not Found - Pista no encontrada.",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Conflict - La pista no puede eliminarse porque tiene reservas futuras activas.",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": "Added as a part of security scheme: bearer",
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/pistas/:id",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "pistas",
+                        ":id"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470",
+                          "description": "Identificador de la pista."
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Conflict",
+                  "code": 409,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Listado de pistas (US-03)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pistas?estado=Disponible",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pistas"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "Disponible"
+                }
+              ]
+            },
+            "description": "Devuelve el listado general de pistas."
+          },
+          "response": [
+            {
+              "name": "OK - Lista de pistas.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/pistas?estado=Disponible",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "pistas"
+                  ],
+                  "query": [
+                    {
+                      "key": "estado",
+                      "value": "Disponible"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": 1,\n    \"nombre\": \"Pista Central\",\n    \"superficie\": \"TierraBatida\",\n    \"estado\": \"Disponible\",\n    \"createdAt\": \"2026-04-06T09:00:00Z\",\n    \"updatedAt\": \"2026-04-06T09:30:00Z\"\n  },\n  {\n    \"id\": 1,\n    \"nombre\": \"Pista Central\",\n    \"superficie\": \"TierraBatida\",\n    \"estado\": \"Disponible\",\n    \"createdAt\": \"2026-04-06T09:00:00Z\",\n    \"updatedAt\": \"2026-04-06T09:30:00Z\"\n  }\n]"
+            },
+            {
+              "name": "Unauthorized - Token ausente, expirado o inválido.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/pistas?estado=Disponible",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "pistas"
+                  ],
+                  "query": [
+                    {
+                      "key": "estado",
+                      "value": "Disponible"
+                    }
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear nueva pista (US-05 / US-07)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Pista Central\",\n  \"superficie\": \"TierraBatida\",\n  \"estado\": \"Disponible\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pistas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pistas"
+              ]
+            },
+            "description": "Solo un usuario con rol Administrador puede crear pistas.\n"
+          },
+          "response": [
+            {
+              "name": "Created - Pista añadida correctamente.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Pista Central\",\n  \"superficie\": \"TierraBatida\",\n  \"estado\": \"Disponible\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/pistas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "pistas"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 1,\n  \"nombre\": \"Pista Central\",\n  \"superficie\": \"TierraBatida\",\n  \"estado\": \"Disponible\",\n  \"createdAt\": \"2026-04-06T09:00:00Z\",\n  \"updatedAt\": \"2026-04-06T09:30:00Z\"\n}"
+            },
+            {
+              "name": "Bad Request - Datos de pista inválidos.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Pista Central\",\n  \"superficie\": \"TierraBatida\",\n  \"estado\": \"Disponible\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/pistas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "pistas"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "Unauthorized - Token ausente, expirado o inválido.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Pista Central\",\n  \"superficie\": \"TierraBatida\",\n  \"estado\": \"Disponible\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/pistas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "pistas"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "Forbidden - Se requiere rol Administrador.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Pista Central\",\n  \"superficie\": \"TierraBatida\",\n  \"estado\": \"Disponible\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/pistas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "pistas"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "Conflict - Ya existe una pista con ese nombre.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Pista Central\",\n  \"superficie\": \"TierraBatida\",\n  \"estado\": \"Disponible\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/pistas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "pistas"
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "disponibilidad",
+      "item": [
+        {
+          "name": "Calendario interactivo de disponibilidad (US-03)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/disponibilidad?fechaInicio=2006-02-05&fechaFin=2006-02-05&idPista=470",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "disponibilidad"
+              ],
+              "query": [
+                {
+                  "key": "fechaInicio",
+                  "value": "2006-02-05",
+                  "description": "Fecha inicial del rango consultado."
+                },
+                {
+                  "key": "fechaFin",
+                  "value": "2006-02-05",
+                  "description": "Fecha final del rango consultado."
+                },
+                {
+                  "key": "idPista",
+                  "value": "470",
+                  "description": "Filtra la disponibilidad para una pista concreta."
+                }
+              ]
+            },
+            "description": "Devuelve las franjas horarias libres y ocupadas por pista para un rango de fechas. Permite navegación diaria o semanal mediante fechaInicio y fechaFin. El servidor debe optimizar la consulta para devolver solo la disponibilidad del rango solicitado.\n"
+          },
+          "response": [
+            {
+              "name": "OK - Disponibilidad obtenida correctamente.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/disponibilidad?fechaInicio=2006-02-05&fechaFin=2006-02-05&idPista=470",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "disponibilidad"
+                  ],
+                  "query": [
+                    {
+                      "description": "Fecha inicial del rango consultado.",
+                      "key": "fechaInicio",
+                      "value": "2006-02-05"
+                    },
+                    {
+                      "description": "Fecha final del rango consultado.",
+                      "key": "fechaFin",
+                      "value": "2006-02-05"
+                    },
+                    {
+                      "description": "Filtra la disponibilidad para una pista concreta.",
+                      "key": "idPista",
+                      "value": "470"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"fechaInicio\": \"2026-04-10\",\n  \"fechaFin\": \"2026-04-16\",\n  \"generatedAt\": \"2026-04-06T12:45:00Z\",\n  \"pistas\": [\n    {\n      \"idPista\": 2,\n      \"nombrePista\": \"Pista Central\",\n      \"estadoPista\": \"Disponible\",\n      \"franjas\": [\n        {\n          \"fecha\": \"2026-04-10\",\n          \"horaInicio\": \"18:00\",\n          \"horaFin\": \"18:00\",\n          \"estado\": \"Disponible\"\n        },\n        {\n          \"fecha\": \"2026-04-10\",\n          \"horaInicio\": \"18:00\",\n          \"horaFin\": \"18:00\",\n          \"estado\": \"Disponible\"\n        }\n      ]\n    },\n    {\n      \"idPista\": 2,\n      \"nombrePista\": \"Pista Central\",\n      \"estadoPista\": \"Disponible\",\n      \"franjas\": [\n        {\n          \"fecha\": \"2026-04-10\",\n          \"horaInicio\": \"18:00\",\n          \"horaFin\": \"18:00\",\n          \"estado\": \"Disponible\"\n        },\n        {\n          \"fecha\": \"2026-04-10\",\n          \"horaInicio\": \"18:00\",\n          \"horaFin\": \"18:00\",\n          \"estado\": \"Disponible\"\n        }\n      ]\n    }\n  ]\n}"
+            },
+            {
+              "name": "Bad Request - Rango de fechas inválido.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/disponibilidad?fechaInicio=2006-02-05&fechaFin=2006-02-05&idPista=470",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "disponibilidad"
+                  ],
+                  "query": [
+                    {
+                      "description": "Fecha inicial del rango consultado.",
+                      "key": "fechaInicio",
+                      "value": "2006-02-05"
+                    },
+                    {
+                      "description": "Fecha final del rango consultado.",
+                      "key": "fechaFin",
+                      "value": "2006-02-05"
+                    },
+                    {
+                      "description": "Filtra la disponibilidad para una pista concreta.",
+                      "key": "idPista",
+                      "value": "470"
+                    }
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "Unauthorized - Token ausente, expirado o inválido.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/disponibilidad?fechaInicio=2006-02-05&fechaFin=2006-02-05&idPista=470",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "disponibilidad"
+                  ],
+                  "query": [
+                    {
+                      "description": "Fecha inicial del rango consultado.",
+                      "key": "fechaInicio",
+                      "value": "2006-02-05"
+                    },
+                    {
+                      "description": "Fecha final del rango consultado.",
+                      "key": "fechaFin",
+                      "value": "2006-02-05"
+                    },
+                    {
+                      "description": "Filtra la disponibilidad para una pista concreta.",
+                      "key": "idPista",
+                      "value": "470"
+                    }
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reservas",
+      "item": [
+        {
+          "name": "{id}",
+          "item": [
+            {
+              "name": "cancelar",
+              "item": [
+                {
+                  "name": "Cancelar reserva futura (US-10)",
+                  "request": {
+                    "method": "PATCH",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/reservas/:id/cancelar",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "reservas",
+                        ":id",
+                        "cancelar"
+                      ],
+                      "variable": [
+                        {
+                          "key": "id",
+                          "value": "470"
+                        }
+                      ]
+                    },
+                    "description": "Marca una reserva futura como cancelada y libera la pista en el calendario. Solo puede cancelar la reserva su propietario o un Administrador.\n"
+                  },
+                  "response": [
+                    {
+                      "name": "OK - Reserva cancelada correctamente.",
+                      "originalRequest": {
+                        "method": "PATCH",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/reservas/:id/cancelar",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "reservas",
+                            ":id",
+                            "cancelar"
+                          ],
+                          "variable": [
+                            {
+                              "key": "id",
+                              "value": "470"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"id\": 1001,\n  \"idPista\": 2,\n  \"nombrePista\": \"Pista Central\",\n  \"fecha\": \"2026-04-10\",\n  \"horaInicio\": \"18:00\",\n  \"horaFin\": \"18:00\",\n  \"duracionMinutos\": 60,\n  \"estado\": \"Confirmada\",\n  \"createdAt\": \"2026-04-06T12:30:00Z\"\n}"
+                    },
+                    {
+                      "name": "Unauthorized - Token ausente, expirado o inválido.",
+                      "originalRequest": {
+                        "method": "PATCH",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/reservas/:id/cancelar",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "reservas",
+                            ":id",
+                            "cancelar"
+                          ],
+                          "variable": [
+                            {
+                              "key": "id",
+                              "value": "470"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Unauthorized",
+                      "code": 401,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                    },
+                    {
+                      "name": "Forbidden - No puedes cancelar una reserva ajena.",
+                      "originalRequest": {
+                        "method": "PATCH",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/reservas/:id/cancelar",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "reservas",
+                            ":id",
+                            "cancelar"
+                          ],
+                          "variable": [
+                            {
+                              "key": "id",
+                              "value": "470"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Forbidden",
+                      "code": 403,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                    },
+                    {
+                      "name": "Not Found - Reserva no encontrada.",
+                      "originalRequest": {
+                        "method": "PATCH",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/reservas/:id/cancelar",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "reservas",
+                            ":id",
+                            "cancelar"
+                          ],
+                          "variable": [
+                            {
+                              "key": "id",
+                              "value": "470"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Not Found",
+                      "code": 404,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                    },
+                    {
+                      "name": "Conflict - La reserva no puede cancelarse porque ya ha comenzado, ha finalizado o ya estaba cancelada.",
+                      "originalRequest": {
+                        "method": "PATCH",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/reservas/:id/cancelar",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "reservas",
+                            ":id",
+                            "cancelar"
+                          ],
+                          "variable": [
+                            {
+                              "key": "id",
+                              "value": "470"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Conflict",
+                      "code": 409,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mis reservas pasadas y futuras (US-10)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reservas?estado=Confirmada&fechaDesde=2006-02-05&fechaHasta=2006-02-05",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "Confirmada"
+                },
+                {
+                  "key": "fechaDesde",
+                  "value": "2006-02-05"
+                },
+                {
+                  "key": "fechaHasta",
+                  "value": "2006-02-05"
+                }
+              ]
+            },
+            "description": "Devuelve únicamente las reservas del usuario autenticado. Si no existen reservas, se devolverá un listado vacío junto a un mensaje informativo.\n"
+          },
+          "response": [
+            {
+              "name": "OK - Historial de reservas del usuario autenticado.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/reservas?estado=Confirmada&fechaDesde=2006-02-05&fechaHasta=2006-02-05",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "reservas"
+                  ],
+                  "query": [
+                    {
+                      "key": "estado",
+                      "value": "Confirmada"
+                    },
+                    {
+                      "key": "fechaDesde",
+                      "value": "2006-02-05"
+                    },
+                    {
+                      "key": "fechaHasta",
+                      "value": "2006-02-05"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"total\": 2,\n  \"items\": [\n    {\n      \"id\": 1001,\n      \"idPista\": 2,\n      \"nombrePista\": \"Pista Central\",\n      \"fecha\": \"2026-04-10\",\n      \"horaInicio\": \"18:00\",\n      \"horaFin\": \"18:00\",\n      \"duracionMinutos\": 60,\n      \"estado\": \"Confirmada\",\n      \"createdAt\": \"2026-04-06T12:30:00Z\"\n    },\n    {\n      \"id\": 1001,\n      \"idPista\": 2,\n      \"nombrePista\": \"Pista Central\",\n      \"fecha\": \"2026-04-10\",\n      \"horaInicio\": \"18:00\",\n      \"horaFin\": \"18:00\",\n      \"duracionMinutos\": 60,\n      \"estado\": \"Confirmada\",\n      \"createdAt\": \"2026-04-06T12:30:00Z\"\n    }\n  ],\n  \"mensaje\": \"Aún no tienes reservas\"\n}"
+            },
+            {
+              "name": "Unauthorized - Token ausente, expirado o inválido.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/reservas?estado=Confirmada&fechaDesde=2006-02-05&fechaHasta=2006-02-05",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "reservas"
+                  ],
+                  "query": [
+                    {
+                      "key": "estado",
+                      "value": "Confirmada"
+                    },
+                    {
+                      "key": "fechaDesde",
+                      "value": "2006-02-05"
+                    },
+                    {
+                      "key": "fechaHasta",
+                      "value": "2006-02-05"
+                    }
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Nueva reserva (US-04 / US-08)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idPista\": 2,\n  \"fecha\": \"2026-04-10\",\n  \"horaInicio\": \"18:00\",\n  \"duracionMinutos\": 60\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reservas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservas"
+              ]
+            },
+            "description": "Crea una nueva reserva para la pista y franja horaria indicada. El backend debe garantizar exclusividad a nivel de servidor frente a peticiones concurrentes, rechazando con 409 cualquier intento de solapamiento.\n"
+          },
+          "response": [
+            {
+              "name": "Created - Reserva confirmada.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"idPista\": 2,\n  \"fecha\": \"2026-04-10\",\n  \"horaInicio\": \"18:00\",\n  \"duracionMinutos\": 60\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/reservas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "reservas"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": 1001,\n  \"idPista\": 2,\n  \"nombrePista\": \"Pista Central\",\n  \"fecha\": \"2026-04-10\",\n  \"horaInicio\": \"18:00\",\n  \"horaFin\": \"18:00\",\n  \"duracionMinutos\": 60,\n  \"estado\": \"Confirmada\",\n  \"createdAt\": \"2026-04-06T12:30:00Z\"\n}"
+            },
+            {
+              "name": "Bad Request - Datos de reserva inválidos.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"idPista\": 2,\n  \"fecha\": \"2026-04-10\",\n  \"horaInicio\": \"18:00\",\n  \"duracionMinutos\": 60\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/reservas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "reservas"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "Unauthorized - Token ausente, expirado o inválido.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"idPista\": 2,\n  \"fecha\": \"2026-04-10\",\n  \"horaInicio\": \"18:00\",\n  \"duracionMinutos\": 60\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/reservas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "reservas"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "Not Found - Pista no encontrada.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"idPista\": 2,\n  \"fecha\": \"2026-04-10\",\n  \"horaInicio\": \"18:00\",\n  \"duracionMinutos\": 60\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/reservas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "reservas"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "Conflict - Pista no disponible en la franja solicitada.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "description": "Added as a part of security scheme: bearer",
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"idPista\": 2,\n  \"fecha\": \"2026-04-10\",\n  \"horaInicio\": \"18:00\",\n  \"duracionMinutos\": 60\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/reservas",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "reservas"
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"timestamp\": \"2026-04-06T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"code\": \"SLOT_NOT_AVAILABLE\",\n  \"message\": \"La pista seleccionada ya está reservada en ese horario.\",\n  \"path\": \"/api/v1/reservas\",\n  \"details\": [\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    },\n    {\n      \"field\": \"email\",\n      \"issue\": \"Debe tener formato de email válido.\"\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1"
+    }
+  ]
+}
