@@ -1,0 +1,1111 @@
+openapi: 3.0.3
+info:
+  title: API Club de Tenis - Contrato final
+  description: 'API REST para la gestión de socios, autenticación, pistas, disponibilidad y reservas. Incluye JWT Bearer, validaciones de esquema reforzadas, respuestas tipadas, control de roles (Socio/Admin), prevención de solapamientos y errores JSON estandarizados.
+
+    '
+  version: 2.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/saz0002organization/Contrato-API-Tenis/2.0.0
+  description: SwaggerHub API Auto Mocking
+- url: http://localhost:8080/api/v1
+  description: Servidor de desarrollo local
+security:
+- bearerAuth: []
+tags:
+- name: Autenticación
+- name: Usuarios
+- name: Pistas
+- name: Disponibilidad
+- name: Reservas
+- name: Administración
+paths:
+  /auth/register:
+    post:
+      tags:
+      - Autenticación
+      summary: Registro de nuevo socio (US-01)
+      description: 'Crea un nuevo usuario con rol Socio. El rol no puede ser enviado por el cliente para evitar elevación de privilegios.
+
+        '
+      operationId: registerUsuario
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioRegistroRequest'
+        required: true
+      responses:
+        '201':
+          description: Usuario creado correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioResponse'
+        '400':
+          description: Bad Request - Datos inválidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - El email ya existe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+  /auth/login:
+    post:
+      tags:
+      - Autenticación
+      summary: Inicio de sesión seguro (US-02)
+      description: 'Valida credenciales y devuelve un token JWT válido. El cliente, tras recibir 200, debe redirigir a la vista de "Mis Reservas". Si las credenciales no son correctas, el servidor devolverá un error genérico sin indicar si el fallo es del email o de la contraseña.
+
+        '
+      operationId: loginUsuario
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: OK - Devuelve Token JWT válido y datos básicos del usuario autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Unauthorized - Credenciales inválidas.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security: []
+  /usuarios/me:
+    get:
+      tags:
+      - Usuarios
+      summary: Obtener mi perfil
+      description: Devuelve el perfil del usuario autenticado.
+      operationId: getMiPerfil
+      responses:
+        '200':
+          description: OK - Perfil del usuario autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioResponse'
+        '401':
+          description: Unauthorized - Token ausente, expirado o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /usuarios/{id}:
+    put:
+      tags:
+      - Usuarios
+      summary: Editar perfil (US-11)
+      description: 'Permite al socio autenticado actualizar su email y/o teléfono. El servidor debe validar que el recurso coincide con el usuario autenticado o que el actor tiene privilegios suficientes.
+
+        '
+      operationId: updateUsuario
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del usuario.
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK - Perfil actualizado correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioResponse'
+        '400':
+          description: Bad Request - Formato inválido de email o teléfono.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Token ausente, expirado o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - No puedes editar el perfil de otro socio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found - Usuario no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - El email ya está en uso por otro usuario.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /usuarios/{id}/baja:
+    post:
+      tags:
+      - Usuarios
+      summary: Baja de socio (US-06)
+      description: 'Solicita la baja del socio autenticado. Requiere doble confirmación mediante password y flag de confirmación. El backend debe invalidar la sesión/token del usuario y preservar la integridad histórica de las reservas mediante borrado lógico y/o anonimización.
+
+        '
+      operationId: bajaUsuario
+      parameters:
+      - name: id
+        in: path
+        description: Identificador del usuario.
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BajaUsuarioRequest'
+        required: true
+      responses:
+        '204':
+          description: No Content - Usuario dado de baja correctamente.
+        '400':
+          description: Bad Request - Falta confirmación o la contraseña es inválida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Token ausente, expirado o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - No puedes borrar a otros socios.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found - Usuario no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /pistas:
+    get:
+      tags:
+      - Pistas
+      summary: Listado de pistas (US-03)
+      description: Devuelve el listado general de pistas.
+      operationId: listarPistas
+      parameters:
+      - name: estado
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/EstadoPista'
+      responses:
+        '200':
+          description: OK - Lista de pistas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PistaResponse'
+        '401':
+          description: Unauthorized - Token ausente, expirado o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+      - Administración
+      summary: Crear nueva pista (US-05 / US-07)
+      description: 'Solo un usuario con rol Administrador puede crear pistas.
+
+        '
+      operationId: crearPista
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PistaCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Created - Pista añadida correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PistaResponse'
+        '400':
+          description: Bad Request - Datos de pista inválidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Token ausente, expirado o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Se requiere rol Administrador.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - Ya existe una pista con ese nombre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /pistas/{id}:
+    get:
+      tags:
+      - Pistas
+      summary: Obtener detalle de una pista
+      operationId: getPistaById
+      parameters:
+      - name: id
+        in: path
+        description: Identificador de la pista.
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          description: OK - Detalle de la pista.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PistaResponse'
+        '401':
+          description: Unauthorized - Token ausente, expirado o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found - Pista no encontrada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+      - Administración
+      summary: Editar pista (US-05 / US-07)
+      description: Solo un usuario con rol Administrador puede editar pistas.
+      operationId: updatePista
+      parameters:
+      - name: id
+        in: path
+        description: Identificador de la pista.
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PistaUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK - Pista actualizada correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PistaResponse'
+        '400':
+          description: Bad Request - Datos de pista inválidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Token ausente, expirado o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Se requiere rol Administrador.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found - Pista no encontrada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - Ya existe otra pista con ese nombre.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Administración
+      summary: Eliminar pista (US-05 / US-07)
+      description: 'Solo un usuario con rol Administrador puede eliminar pistas. El backend puede rechazar la eliminación si existen reservas futuras asociadas.
+
+        '
+      operationId: deletePista
+      parameters:
+      - name: id
+        in: path
+        description: Identificador de la pista.
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+      responses:
+        '204':
+          description: No Content - Pista eliminada correctamente.
+        '401':
+          description: Unauthorized - Token ausente, expirado o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Se requiere rol Administrador.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found - Pista no encontrada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - La pista no puede eliminarse porque tiene reservas futuras activas.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /disponibilidad:
+    get:
+      tags:
+      - Disponibilidad
+      summary: Calendario interactivo de disponibilidad (US-03)
+      description: 'Devuelve las franjas horarias libres y ocupadas por pista para un rango de fechas. Permite navegación diaria o semanal mediante fechaInicio y fechaFin. El servidor debe optimizar la consulta para devolver solo la disponibilidad del rango solicitado.
+
+        '
+      operationId: consultarDisponibilidad
+      parameters:
+      - name: fechaInicio
+        in: query
+        description: Fecha inicial del rango consultado.
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: fechaFin
+        in: query
+        description: Fecha final del rango consultado.
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: idPista
+        in: query
+        description: Filtra la disponibilidad para una pista concreta.
+        required: false
+        schema:
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          description: OK - Disponibilidad obtenida correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisponibilidadResponse'
+        '400':
+          description: Bad Request - Rango de fechas inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Token ausente, expirado o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reservas:
+    get:
+      tags:
+      - Reservas
+      summary: Mis reservas pasadas y futuras (US-10)
+      description: 'Devuelve únicamente las reservas del usuario autenticado. Si no existen reservas, se devolverá un listado vacío junto a un mensaje informativo.
+
+        '
+      operationId: listarMisReservas
+      parameters:
+      - name: estado
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/EstadoReserva'
+      - name: fechaDesde
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: fechaHasta
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: OK - Historial de reservas del usuario autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MisReservasResponse'
+        '401':
+          description: Unauthorized - Token ausente, expirado o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+      - Reservas
+      summary: Nueva reserva (US-04 / US-08)
+      description: 'Crea una nueva reserva para la pista y franja horaria indicada. El backend debe garantizar exclusividad a nivel de servidor frente a peticiones concurrentes, rechazando con 409 cualquier intento de solapamiento.
+
+        '
+      operationId: crearReserva
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservaCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Created - Reserva confirmada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservaResponse'
+        '400':
+          description: Bad Request - Datos de reserva inválidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - Token ausente, expirado o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found - Pista no encontrada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - Pista no disponible en la franja solicitada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reservas/{id}/cancelar:
+    patch:
+      tags:
+      - Reservas
+      summary: Cancelar reserva futura (US-10)
+      description: 'Marca una reserva futura como cancelada y libera la pista en el calendario. Solo puede cancelar la reserva su propietario o un Administrador.
+
+        '
+      operationId: cancelarReserva
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          description: OK - Reserva cancelada correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservaResponse'
+        '401':
+          description: Unauthorized - Token ausente, expirado o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - No puedes cancelar una reserva ajena.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not Found - Reserva no encontrada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - La reserva no puede cancelarse porque ya ha comenzado, ha finalizado o ya estaba cancelada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ErrorResponse:
+      required:
+      - code
+      - error
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: 2026-04-06 12:00:00+00:00
+        status:
+          type: integer
+          example: 409
+        error:
+          type: string
+          example: Conflict
+        code:
+          type: string
+          example: SLOT_NOT_AVAILABLE
+        message:
+          maxLength: 300
+          type: string
+          example: La pista seleccionada ya está reservada en ese horario.
+        path:
+          maxLength: 150
+          type: string
+          example: /api/v1/reservas
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationErrorDetail'
+      additionalProperties: false
+    ValidationErrorDetail:
+      required:
+      - field
+      - issue
+      type: object
+      properties:
+        field:
+          maxLength: 50
+          type: string
+          example: email
+        issue:
+          maxLength: 200
+          type: string
+          example: Debe tener formato de email válido.
+      additionalProperties: false
+    LoginRequest:
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          maxLength: 120
+          type: string
+          format: email
+          example: juan@padel.com
+        password:
+          maxLength: 100
+          minLength: 8
+          type: string
+          format: password
+          example: MiClaveSegura123
+      additionalProperties: false
+    LoginResponse:
+      required:
+      - accessToken
+      - expiresIn
+      - tokenType
+      - usuario
+      type: object
+      properties:
+        accessToken:
+          minLength: 20
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        tokenType:
+          type: string
+          example: Bearer
+          enum:
+          - Bearer
+        expiresIn:
+          minimum: 1
+          type: integer
+          example: 3600
+        usuario:
+          $ref: '#/components/schemas/UsuarioResumen'
+      additionalProperties: false
+    RolUsuario:
+      type: string
+      example: Socio
+      enum:
+      - Socio
+      - Admin
+    EstadoPista:
+      type: string
+      example: Disponible
+      enum:
+      - Disponible
+      - Mantenimiento
+      - FueraDeServicio
+    EstadoReserva:
+      type: string
+      example: Confirmada
+      enum:
+      - Confirmada
+      - Cancelada
+    EstadoFranja:
+      type: string
+      example: Disponible
+      enum:
+      - Disponible
+      - Ocupada
+      - NoDisponible
+    UsuarioRegistroRequest:
+      required:
+      - email
+      - nombre
+      - password
+      - telefono
+      type: object
+      properties:
+        nombre:
+          maxLength: 80
+          minLength: 2
+          pattern: ^[A-Za-zÁÉÍÓÚáéíóúÑñÜü' .-]{2,80}$
+          type: string
+          example: Juan Pérez
+        email:
+          maxLength: 120
+          type: string
+          format: email
+          example: juan@padel.com
+        password:
+          maxLength: 100
+          minLength: 8
+          type: string
+          format: password
+          example: MiClaveSegura123
+        telefono:
+          pattern: ^\+?[0-9]{9,15}$
+          type: string
+          example: '+34600112233'
+      additionalProperties: false
+    UsuarioResumen:
+      required:
+      - email
+      - id
+      - nombre
+      - rol
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          example: 10
+        nombre:
+          maxLength: 80
+          type: string
+          example: Juan Pérez
+        email:
+          maxLength: 120
+          type: string
+          format: email
+          example: juan@padel.com
+        rol:
+          $ref: '#/components/schemas/RolUsuario'
+      additionalProperties: false
+    UsuarioResponse:
+      required:
+      - activo
+      - createdAt
+      - email
+      - id
+      - nombre
+      - rol
+      - telefono
+      - updatedAt
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          example: 10
+        nombre:
+          maxLength: 80
+          type: string
+          example: Juan Pérez
+        email:
+          maxLength: 120
+          type: string
+          format: email
+          example: juan@padel.com
+        telefono:
+          pattern: ^\+?[0-9]{9,15}$
+          type: string
+          example: '+34600112233'
+        rol:
+          $ref: '#/components/schemas/RolUsuario'
+        activo:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          example: 2026-04-06 10:00:00+00:00
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2026-04-06 10:15:00+00:00
+      additionalProperties: false
+    UsuarioUpdateRequest:
+      type: object
+      properties:
+        email:
+          maxLength: 120
+          type: string
+          format: email
+          example: nuevoemail@padel.com
+        telefono:
+          pattern: ^\+?[0-9]{9,15}$
+          type: string
+          example: '+34655111222'
+      additionalProperties: false
+      anyOf:
+      - required:
+        - email
+      - required:
+        - telefono
+    BajaUsuarioRequest:
+      required:
+      - confirmar
+      - password
+      type: object
+      properties:
+        password:
+          maxLength: 100
+          minLength: 8
+          type: string
+          format: password
+          example: MiClaveSegura123
+        confirmar:
+          type: boolean
+          example: true
+          enum:
+          - true
+      additionalProperties: false
+    PistaCreateRequest:
+      required:
+      - estado
+      - nombre
+      - superficie
+      type: object
+      properties:
+        nombre:
+          maxLength: 60
+          minLength: 2
+          pattern: ^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ ._-]{2,60}$
+          type: string
+          example: Pista Central
+        superficie:
+          maxLength: 30
+          minLength: 3
+          type: string
+          example: Cristal
+          enum:
+          - Cristal
+          - Muro
+          - CéspedArtificial
+          - HormigónPoroso
+        estado:
+          $ref: '#/components/schemas/EstadoPista'
+      additionalProperties: false
+    PistaUpdateRequest:
+      type: object
+      properties:
+        nombre:
+          maxLength: 60
+          minLength: 2
+          pattern: ^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ ._-]{2,60}$
+          type: string
+          example: Pista Norte
+        superficie:
+          maxLength: 30
+          minLength: 3
+          type: string
+          example: Cristal
+          enum:
+          - Cristal
+          - Muro
+          - CéspedArtificial
+          - HormigónPoroso
+        estado:
+          $ref: '#/components/schemas/EstadoPista'
+      additionalProperties: false
+      anyOf:
+      - required:
+        - nombre
+      - required:
+        - superficie
+      - required:
+        - estado
+    PistaResponse:
+      required:
+      - createdAt
+      - estado
+      - id
+      - nombre
+      - superficie
+      - updatedAt
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          example: 1
+        nombre:
+          maxLength: 60
+          type: string
+          example: Pista Central
+        superficie:
+          type: string
+          example: Cristal
+        estado:
+          $ref: '#/components/schemas/EstadoPista'
+        createdAt:
+          type: string
+          format: date-time
+          example: 2026-04-06 09:00:00+00:00
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2026-04-06 09:30:00+00:00
+      additionalProperties: false
+    HoraHHmm:
+      pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+      type: string
+      example: 1080
+    ReservaCreateRequest:
+      required:
+      - duracionMinutos
+      - fecha
+      - horaInicio
+      - idPista
+      type: object
+      properties:
+        idPista:
+          minimum: 1
+          type: integer
+          example: 2
+        fecha:
+          type: string
+          format: date
+          example: 2026-04-10
+        horaInicio:
+          $ref: '#/components/schemas/HoraHHmm'
+        duracionMinutos:
+          multipleOf: 30
+          maximum: 180
+          minimum: 30
+          type: integer
+          example: 60
+      additionalProperties: false
+    ReservaResponse:
+      required:
+      - createdAt
+      - duracionMinutos
+      - estado
+      - fecha
+      - horaFin
+      - horaInicio
+      - id
+      - idPista
+      - nombrePista
+      type: object
+      properties:
+        id:
+          minimum: 1
+          type: integer
+          example: 1001
+        idPista:
+          minimum: 1
+          type: integer
+          example: 2
+        nombrePista:
+          maxLength: 60
+          type: string
+          example: Pista Central
+        fecha:
+          type: string
+          format: date
+          example: 2026-04-10
+        horaInicio:
+          $ref: '#/components/schemas/HoraHHmm'
+        horaFin:
+          $ref: '#/components/schemas/HoraHHmm'
+        duracionMinutos:
+          multipleOf: 30
+          maximum: 180
+          minimum: 30
+          type: integer
+          example: 60
+        estado:
+          $ref: '#/components/schemas/EstadoReserva'
+        createdAt:
+          type: string
+          format: date-time
+          example: 2026-04-06 12:30:00+00:00
+      additionalProperties: false
+    MisReservasResponse:
+      required:
+      - items
+      - total
+      type: object
+      properties:
+        total:
+          minimum: 0
+          type: integer
+          example: 2
+        mensaje:
+          maxLength: 120
+          type: string
+          example: Aún no tienes reservas
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservaResponse'
+      additionalProperties: false
+    FranjaDisponibilidad:
+      required:
+      - estado
+      - fecha
+      - horaFin
+      - horaInicio
+      type: object
+      properties:
+        fecha:
+          type: string
+          format: date
+          example: 2026-04-10
+        horaInicio:
+          $ref: '#/components/schemas/HoraHHmm'
+        horaFin:
+          $ref: '#/components/schemas/HoraHHmm'
+        estado:
+          $ref: '#/components/schemas/EstadoFranja'
+      additionalProperties: false
+    DisponibilidadPista:
+      required:
+      - estadoPista
+      - franjas
+      - idPista
+      - nombrePista
+      type: object
+      properties:
+        idPista:
+          minimum: 1
+          type: integer
+          example: 2
+        nombrePista:
+          maxLength: 60
+          type: string
+          example: Pista Central
+        estadoPista:
+          $ref: '#/components/schemas/EstadoPista'
+        franjas:
+          type: array
+          items:
+            $ref: '#/components/schemas/FranjaDisponibilidad'
+      additionalProperties: false
+    DisponibilidadResponse:
+      required:
+      - fechaFin
+      - fechaInicio
+      - generatedAt
+      - pistas
+      type: object
+      properties:
+        fechaInicio:
+          type: string
+          format: date
+          example: 2026-04-10
+        fechaFin:
+          type: string
+          format: date
+          example: 2026-04-16
+        generatedAt:
+          type: string
+          format: date-time
+          example: 2026-04-06 12:45:00+00:00
+        pistas:
+          type: array
+          items:
+            $ref: '#/components/schemas/DisponibilidadPista'
+      additionalProperties: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
