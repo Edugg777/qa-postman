@@ -1,0 +1,43 @@
+info:
+  name: Error 400 - Faltan Datos
+  type: http
+  seq: 4
+  tags:
+    - Autenticación
+
+http:
+  method: POST
+  url: "{{baseUrl}}/auth/register"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "edu@edu.com",
+        "telefono": "+34600123456"
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: baseUrl
+      value: http://localhost:4010
+  scripts:
+    - type: tests
+      code: |-
+        test("El código de HTTP debe ser 400", function() {
+          expect(res.getStatus()).to.equal(400);
+        });
+
+        test("Debe devolver el mensaje de éxito correcto", function() {
+          const data = res.getBody();
+          expect(data.message).to.equal("Usuario creado correctamente");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |
+  Crea un nuevo usuario con rol Socio. El rol no puede ser enviado por el cliente para evitar elevación de privilegios.

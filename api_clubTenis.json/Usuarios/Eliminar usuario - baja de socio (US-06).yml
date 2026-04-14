@@ -1,0 +1,217 @@
+info:
+  name: Eliminar usuario / baja de socio (US-06)
+  type: http
+  seq: 3
+  tags:
+    - Usuarios
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/usuarios/:id"
+  params:
+    - name: id
+      value: "1"
+      type: path
+      description: Identificador del usuario.
+  body:
+    type: json
+    data: |-
+      {
+        "password": "MiClaveSegura123",
+        "confirmar": true
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 204 Response
+    description: No Content - Usuario dado de baja correctamente.
+    request:
+      url: "{{baseUrl}}/usuarios/:id"
+      method: DELETE
+      params:
+        - name: id
+          value: "1"
+          type: path
+          description: Identificador del usuario.
+      body:
+        type: json
+        data: |-
+          {
+            "password": "MiClaveSegura123",
+            "confirmar": true
+          }
+    response:
+      status: 204
+      statusText: No Content
+      body:
+        type: text
+        data: ""
+  - name: 400 Response
+    description: Bad Request - Falta confirmación o la contraseña es inválida.
+    request:
+      url: "{{baseUrl}}/usuarios/:id"
+      method: DELETE
+      params:
+        - name: id
+          value: "1"
+          type: path
+          description: Identificador del usuario.
+      body:
+        type: json
+        data: |-
+          {
+            "password": "MiClaveSegura123",
+            "confirmar": true
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-04-06T12:00:00Z",
+            "status": 409,
+            "error": "Conflict",
+            "code": "SLOT_NOT_AVAILABLE",
+            "message": "La pista seleccionada ya está reservada en ese horario.",
+            "path": "/api/v1/reservas",
+            "details": [
+              {
+                "field": "email",
+                "issue": "Debe tener formato de email válido."
+              }
+            ]
+          }
+  - name: 401 Response
+    description: Unauthorized - Token ausente, expirado o inválido.
+    request:
+      url: "{{baseUrl}}/usuarios/:id"
+      method: DELETE
+      params:
+        - name: id
+          value: "1"
+          type: path
+          description: Identificador del usuario.
+      body:
+        type: json
+        data: |-
+          {
+            "password": "MiClaveSegura123",
+            "confirmar": true
+          }
+    response:
+      status: 401
+      statusText: Unauthorized
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-04-06T12:00:00Z",
+            "status": 409,
+            "error": "Conflict",
+            "code": "SLOT_NOT_AVAILABLE",
+            "message": "La pista seleccionada ya está reservada en ese horario.",
+            "path": "/api/v1/reservas",
+            "details": [
+              {
+                "field": "email",
+                "issue": "Debe tener formato de email válido."
+              }
+            ]
+          }
+  - name: 403 Response
+    description: Forbidden - No puedes borrar a otros socios.
+    request:
+      url: "{{baseUrl}}/usuarios/:id"
+      method: DELETE
+      params:
+        - name: id
+          value: "1"
+          type: path
+          description: Identificador del usuario.
+      body:
+        type: json
+        data: |-
+          {
+            "password": "MiClaveSegura123",
+            "confirmar": true
+          }
+    response:
+      status: 403
+      statusText: Forbidden
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-04-06T12:00:00Z",
+            "status": 409,
+            "error": "Conflict",
+            "code": "SLOT_NOT_AVAILABLE",
+            "message": "La pista seleccionada ya está reservada en ese horario.",
+            "path": "/api/v1/reservas",
+            "details": [
+              {
+                "field": "email",
+                "issue": "Debe tener formato de email válido."
+              }
+            ]
+          }
+  - name: 404 Response
+    description: Not Found - Usuario no encontrado.
+    request:
+      url: "{{baseUrl}}/usuarios/:id"
+      method: DELETE
+      params:
+        - name: id
+          value: "1"
+          type: path
+          description: Identificador del usuario.
+      body:
+        type: json
+        data: |-
+          {
+            "password": "MiClaveSegura123",
+            "confirmar": true
+          }
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-04-06T12:00:00Z",
+            "status": 409,
+            "error": "Conflict",
+            "code": "SLOT_NOT_AVAILABLE",
+            "message": "La pista seleccionada ya está reservada en ese horario.",
+            "path": "/api/v1/reservas",
+            "details": [
+              {
+                "field": "email",
+                "issue": "Debe tener formato de email válido."
+              }
+            ]
+          }
+
+docs: |
+  Solicita la baja del socio autenticado. Requiere doble confirmación mediante password y flag de confirmación. El backend debe invalidar la sesión/token del usuario y preservar la integridad histórica de las reservas mediante borrado lógico y/o anonimización.

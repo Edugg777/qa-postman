@@ -1,0 +1,213 @@
+info:
+  name: Nueva reserva (US-04 / US-08)
+  type: http
+  seq: 2
+  tags:
+    - Reservas
+
+http:
+  method: POST
+  url: "{{baseUrl}}/reservas"
+  body:
+    type: json
+    data: |-
+      {
+        "idPista": 2,
+        "fecha": "2026-04-10",
+        "horaInicio": "18:00",
+        "duracionMinutos": 60
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 201 Response
+    description: Created - Reserva confirmada.
+    request:
+      url: "{{baseUrl}}/reservas"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "idPista": 2,
+            "fecha": "2026-04-10",
+            "horaInicio": "18:00",
+            "duracionMinutos": 60
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": 1001,
+            "idPista": 2,
+            "nombrePista": "Pista Central",
+            "fecha": "2026-04-10",
+            "horaInicio": "18:00",
+            "horaFin": "18:00",
+            "duracionMinutos": 60,
+            "estado": "Confirmada",
+            "createdAt": "2026-04-06T12:30:00Z"
+          }
+  - name: 400 Response
+    description: Bad Request - Datos de reserva inválidos.
+    request:
+      url: "{{baseUrl}}/reservas"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "idPista": 2,
+            "fecha": "2026-04-10",
+            "horaInicio": "18:00",
+            "duracionMinutos": 60
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-04-06T12:00:00Z",
+            "status": 409,
+            "error": "Conflict",
+            "code": "SLOT_NOT_AVAILABLE",
+            "message": "La pista seleccionada ya está reservada en ese horario.",
+            "path": "/api/v1/reservas",
+            "details": [
+              {
+                "field": "email",
+                "issue": "Debe tener formato de email válido."
+              }
+            ]
+          }
+  - name: 401 Response
+    description: Unauthorized - Token ausente, expirado o inválido.
+    request:
+      url: "{{baseUrl}}/reservas"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "idPista": 2,
+            "fecha": "2026-04-10",
+            "horaInicio": "18:00",
+            "duracionMinutos": 60
+          }
+    response:
+      status: 401
+      statusText: Unauthorized
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-04-06T12:00:00Z",
+            "status": 409,
+            "error": "Conflict",
+            "code": "SLOT_NOT_AVAILABLE",
+            "message": "La pista seleccionada ya está reservada en ese horario.",
+            "path": "/api/v1/reservas",
+            "details": [
+              {
+                "field": "email",
+                "issue": "Debe tener formato de email válido."
+              }
+            ]
+          }
+  - name: 404 Response
+    description: Not Found - Pista no encontrada.
+    request:
+      url: "{{baseUrl}}/reservas"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "idPista": 2,
+            "fecha": "2026-04-10",
+            "horaInicio": "18:00",
+            "duracionMinutos": 60
+          }
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-04-06T12:00:00Z",
+            "status": 409,
+            "error": "Conflict",
+            "code": "SLOT_NOT_AVAILABLE",
+            "message": "La pista seleccionada ya está reservada en ese horario.",
+            "path": "/api/v1/reservas",
+            "details": [
+              {
+                "field": "email",
+                "issue": "Debe tener formato de email válido."
+              }
+            ]
+          }
+  - name: 409 Response
+    description: Conflict - Pista no disponible en la franja solicitada.
+    request:
+      url: "{{baseUrl}}/reservas"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "idPista": 2,
+            "fecha": "2026-04-10",
+            "horaInicio": "18:00",
+            "duracionMinutos": 60
+          }
+    response:
+      status: 409
+      statusText: Conflict
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-04-06T12:00:00Z",
+            "status": 409,
+            "error": "Conflict",
+            "code": "SLOT_NOT_AVAILABLE",
+            "message": "La pista seleccionada ya está reservada en ese horario.",
+            "path": "/api/v1/reservas",
+            "details": [
+              {
+                "field": "email",
+                "issue": "Debe tener formato de email válido."
+              }
+            ]
+          }
+
+docs: |
+  Crea una nueva reserva para la pista y franja horaria indicada. El backend debe garantizar exclusividad a nivel de servidor frente a peticiones concurrentes, rechazando con 409 cualquier intento de solapamiento.

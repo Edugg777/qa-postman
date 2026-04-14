@@ -1,0 +1,132 @@
+info:
+  name: Mis reservas pasadas y futuras (US-10)
+  type: http
+  seq: 1
+  tags:
+    - Reservas
+
+http:
+  method: GET
+  url: "{{baseUrl}}/reservas"
+  params:
+    - name: estado
+      value: Confirmada
+      type: query
+      disabled: true
+    - name: estado
+      value: Cancelada
+      type: query
+      disabled: true
+    - name: fechaDesde
+      value: ""
+      type: query
+      disabled: true
+    - name: fechaHasta
+      value: ""
+      type: query
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: OK - Historial de reservas del usuario autenticado.
+    request:
+      url: "{{baseUrl}}/reservas"
+      method: GET
+      params:
+        - name: estado
+          value: Confirmada
+          type: query
+          disabled: true
+        - name: estado
+          value: Cancelada
+          type: query
+          disabled: true
+        - name: fechaDesde
+          value: ""
+          type: query
+          disabled: true
+        - name: fechaHasta
+          value: ""
+          type: query
+          disabled: true
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "total": 2,
+            "mensaje": "Aún no tienes reservas",
+            "items": [
+              {
+                "id": 1001,
+                "idPista": 2,
+                "nombrePista": "Pista Central",
+                "fecha": "2026-04-10",
+                "horaInicio": "18:00",
+                "horaFin": "18:00",
+                "duracionMinutos": 60,
+                "estado": "Confirmada",
+                "createdAt": "2026-04-06T12:30:00Z"
+              }
+            ]
+          }
+  - name: 401 Response
+    description: Unauthorized - Token ausente, expirado o inválido.
+    request:
+      url: "{{baseUrl}}/reservas"
+      method: GET
+      params:
+        - name: estado
+          value: Confirmada
+          type: query
+          disabled: true
+        - name: estado
+          value: Cancelada
+          type: query
+          disabled: true
+        - name: fechaDesde
+          value: ""
+          type: query
+          disabled: true
+        - name: fechaHasta
+          value: ""
+          type: query
+          disabled: true
+    response:
+      status: 401
+      statusText: Unauthorized
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-04-06T12:00:00Z",
+            "status": 409,
+            "error": "Conflict",
+            "code": "SLOT_NOT_AVAILABLE",
+            "message": "La pista seleccionada ya está reservada en ese horario.",
+            "path": "/api/v1/reservas",
+            "details": [
+              {
+                "field": "email",
+                "issue": "Debe tener formato de email válido."
+              }
+            ]
+          }
+
+docs: |
+  Devuelve únicamente las reservas del usuario autenticado. Si no existen reservas, se devolverá un listado vacío junto a un mensaje informativo.
